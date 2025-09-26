@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { signinUser } from "../features/auth/authslice";
+import { authCheck, signinUser } from "../features/auth/authslice";
 import { Link } from "react-router-dom";
 
 function SignIn() {
@@ -12,6 +12,7 @@ function SignIn() {
         e.preventDefault();
         console.log({ email, password });
         dispatch(signinUser({ email, password }));
+        dispatch(authCheck());
     };
 
     return (

@@ -1,38 +1,33 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Axios instance (optional) → baseURL set कर सकते हो
+// Axios instance
 export const api = axios.create({
-    baseURL: "/api/v1/auth",
+    baseURL: `https://rtchatback-4.onrender.com/api/v1/auth`,
     headers: { "Content-Type": "application/json" },
+    withCredentials: true,
 });
+
 
 // Async Thunks
 export const signupUser = createAsyncThunk(
     "auth/signupUser",
     async (user, { dispatch, rejectWithValue }) => {
         try {
-            // 1️⃣ Signup request → backend cookie set करेगा
             await api.post("/signup", user);
-
-            // 2️⃣ Signup ke baad turant authCheck call
-            const authResponse = await dispatch(authCheck()).unwrap(); // unwrap se fulfilled data milega
-            return authResponse; // ye user data reducer me jayega
+            const authResponse = await dispatch(authCheck()).unwrap();
+            return authResponse;
         } catch (error) {
             return rejectWithValue(error.response?.data || "Signup failed");
         }
     }
 );
 
-
 export const signinUser = createAsyncThunk(
     "auth/signinUser",
     async (user, { dispatch, rejectWithValue }) => {
         try {
-            // 1️⃣ Signin request → backend cookie set karega
             await api.post("/signin", user);
-
-            // 2️⃣ Signin ke turant baad authCheck call
             const authResponse = await dispatch(authCheck()).unwrap();
             return authResponse;
         } catch (error) {
@@ -41,43 +36,47 @@ export const signinUser = createAsyncThunk(
     }
 );
 
-
-export const logoutUser = createAsyncThunk("auth/logout", async (_, { rejectWithValue }) => {
-    try {
-        const response = await api.post("/logout");
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response?.data || "Logout failed");
+export const logoutUser = createAsyncThunk(
+    "auth/logout",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/logout");
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || "Logout failed");
+        }
     }
-});
+);
 
 export const authCheck = createAsyncThunk(
     "auth/authCheck",
     async (_, { rejectWithValue }) => {
         try {
-            
-            const response = await api.get("/protected"); // cookie automatically backend ko jayegi
-            return response.data; // assume { user: {...} }
+            const response = await api.get("/protected"); // ✅ backend route confirm करो
+            return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data || "Auth check failed");
         }
     }
 );
 
-export const signOut = createAsyncThunk("auth/signOut", async (_, { rejectWithValue }) => {
-    try {
-        const response = await api.post("/signout");
-        return response.data;
-    } catch (error) {
-        return rejectWithValue(error.response?.data || "Sign out failed");
+export const signOut = createAsyncThunk(
+    "auth/signOut",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await api.post("/signout");
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || "Sign out failed");
+        }
     }
-});
+);
 
 // Initial State
 const initialState = {
     user: null,
     isSignin: false,
-    loading: true,
+    loading: false,
     error: null,
 };
 
@@ -100,7 +99,7 @@ const authSlice = createSlice({
             })
             .addCase(signupUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.data;
+                state.user = action.payload;
                 state.isSignin = true;
             })
             .addCase(signupUser.rejected, (state, action) => {
@@ -115,7 +114,7 @@ const authSlice = createSlice({
             })
             .addCase(signinUser.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.data;
+                state.user = action.payload;
                 state.isSignin = true;
             })
             .addCase(signinUser.rejected, (state, action) => {
@@ -130,15 +129,13 @@ const authSlice = createSlice({
             })
 
             // authCheck
-
             .addCase(authCheck.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
-
             .addCase(authCheck.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload.data;
+                state.user = action.payload;
                 state.isSignin = true;
             })
             .addCase(authCheck.rejected, (state) => {
@@ -146,10 +143,9 @@ const authSlice = createSlice({
                 state.user = null;
                 state.isSignin = false;
             });
-        
-
     },
 });
 
 export const { logout } = authSlice.actions;
 export default authSlice.reducer;
+export const selectCurrentUser = (state) => state.auth.user;

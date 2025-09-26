@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
-import { authCheck } from "./features/auth/authslice";
+import { authCheck, signinUser, signOut } from "./features/auth/authslice";
 import { BlinkBlur } from "react-loading-indicators";
 import Sidebar from "./components/Sidebar";
 import Contracts from "./components/Contracts";
@@ -41,25 +41,28 @@ function App() {
       </div>
     );
   }
-  if (!isSignin && !loading) {
-    return (
-      <div>
-        <Routes>
+  return (
+    <Routes>
+      {!isSignin && !loading ? (
+        <>
           <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<SignIn />} />
-        </Routes>
-      </div>
-    );
-  }
-
-  return (
-    <div className="h-full w-screen md:p-[60px_0px_0px_0px] p-[60px_0px_0px_0px] overflow-hidden transition-all duration-300 fixed">
-      <Sidebar />
-      <main className="flex h-full w-full overflow-hidden rounded-tl-lg">
-        <Contracts />
-        <ChatContainer />
-      </main>
-    </div>
+        </>
+      ) : (
+        <Route
+          path="*"
+          element={
+            <div className="h-full w-screen md:p-[60px_0px_0px_0px] p-[60px_0px_0px_0px] overflow-hidden transition-all duration-300 fixed">
+              <Sidebar />
+              <main className="flex h-full w-full overflow-hidden rounded-tl-lg">
+                <Contracts />
+                <ChatContainer />
+              </main>
+            </div>
+          }
+        />
+      )}
+    </Routes>
   );
 }
 

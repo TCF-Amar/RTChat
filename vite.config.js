@@ -5,14 +5,5 @@ import tailwindcss from "@tailwindcss/vite";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://rtchatback-4.onrender.com",
-        changeOrigin: true,
-      },
-      
-    },
-    port: 3000,
-  },
+  
 })
