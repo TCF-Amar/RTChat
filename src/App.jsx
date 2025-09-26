@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Routes, Route } from "react-router-dom";
 import { authCheck, signinUser, signOut } from "./features/auth/authslice";
 import { BlinkBlur } from "react-loading-indicators";
 import Sidebar from "./components/Sidebar";
@@ -8,6 +9,7 @@ import ChatContainer from "./components/ChatContainer";
 import { connectSocket } from "./app/socket";
 import { setSocket } from "./features/socket/socketSlice";
 import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
   
 
 function App() {
@@ -40,7 +42,14 @@ function App() {
     );
   }
   if (!isSignin && !loading) {
-    return <SignIn />;
+    return (
+      <div>
+        <Routes>
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="*" element={<SignIn />} />
+        </Routes>
+      </div>
+    );
   }
 
   return (

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { signinUser } from "../features/auth/authslice";
+import { Link } from "react-router-dom";
 
 function SignIn() {
     const [email, setEmail] = useState("");
@@ -26,7 +27,7 @@ function SignIn() {
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="Email"
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border text-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="password"
@@ -34,7 +35,7 @@ function SignIn() {
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Password"
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                         type="submit"
@@ -45,9 +46,9 @@ function SignIn() {
                 </form>
                 <p className="text-center text-sm text-gray-500 mt-4">
                     Don’t have an account?{" "}
-                    <a href="/signup" className="text-blue-600 hover:underline">
+                    <Link to="/signup" className="text-blue-600 hover:underline">
                         Sign Up
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>
