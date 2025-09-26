@@ -1,9 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const getAllContacts = createAsyncThunk("contact/getAllContacts", async (_, { rejectWithValue }) => {
     try {
-        const response = await axios.get("/api/v1/user/all");
+        const response = await axios.get(`${API_URL}/api/v1/user/all`);
         return response.data;
     } catch (error) {
         return rejectWithValue(error.response?.data || "Failed to fetch contacts");

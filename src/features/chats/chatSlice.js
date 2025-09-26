@@ -1,12 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
 // Fetch chat history with a user
 export const getChats = createAsyncThunk(
   "chat/getChats",
   async (receiverId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/v1/chat/${receiverId}`);
+      const response = await axios.get(`${API_URL}/api/v1/chat/${receiverId}`);
       if (response.data.statusCode === 200) {
         return response.data.data;
       }
@@ -22,7 +23,7 @@ export const sendChat = createAsyncThunk(
   "chat/sendChat",
   async ({ receiverId, messageData }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/api/v1/chat/${receiverId}`, messageData);
+      const response = await axios.post(`${API_URL}/api/v1/chat/${receiverId}`, messageData);
       if (response.data.statusCode === 200) {
         return response.data.data;
       }

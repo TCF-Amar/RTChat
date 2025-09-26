@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Routes, Route } from "react-router-dom";
-import { authCheck, signinUser, signOut } from "./features/auth/authslice";
+import { authCheck } from "./features/auth/authslice";
 import { BlinkBlur } from "react-loading-indicators";
 import Sidebar from "./components/Sidebar";
 import Contracts from "./components/Contracts";

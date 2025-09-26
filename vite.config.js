@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://rtchatback-4.onrender.com/",
+        target: "https://rtchatback-4.onrender.com",
         changeOrigin: true,
       },
       

@@ -54,7 +54,7 @@ const SignUp = () => {
 
             if (response.data.statusCode === 201) {
                 // Registration successful, redirect to login
-                navigate('/signin');
+                navigate('/');
             } else {
                 setError(response.data.message || 'Registration failed');
             }
