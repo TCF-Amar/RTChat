@@ -1,44 +1,46 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { signupUser } from '../features/auth/authslice';
 import Logo from './Logo';
 
 const SignUp = () => {
     const [formData, setFormData] = useState({
+        name: '',
         username: '',
         email: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    
+
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    // input change handle
     const handleChange = (e) => {
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value
+            [e.target.name]: e.target.value,
         });
-        // Clear error when user starts typing
+
         if (error) setError('');
     };
 
+    // form submit
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
 
-        // Validate passwords match
+        // password validation
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             setLoading(false);
             return;
         }
 
-        // Validate password strength
         if (formData.password.length < 6) {
             setError('Password must be at least 6 characters long');
             setLoading(false);
@@ -46,20 +48,16 @@ const SignUp = () => {
         }
 
         try {
-            const response = await axios.post('/api/v1/auth/register', {
-                username: formData.username,
-                email: formData.email,
-                password: formData.password
-            });
+            // redux dispatch
+            const resultAction = await dispatch(signupUser(formData));
 
-            if (response.data.statusCode === 201) {
-                // Registration successful, redirect to login
-                navigate('/');
+            if (signupUser.fulfilled.match(resultAction)) {
+                navigate('/'); // signup ke baad home ya dashboard
             } else {
-                setError(response.data.message || 'Registration failed');
+                setError(resultAction.payload || 'Signup failed. Please try again.');
             }
         } catch (err) {
-            setError(err.response?.data?.message || 'Registration failed');
+            setError(err.message || 'Something went wrong');
         } finally {
             setLoading(false);
         }
@@ -83,8 +81,24 @@ const SignUp = () => {
                         </button>
                     </p>
                 </div>
+
                 <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
                     <div className="rounded-md shadow-sm -space-y-px">
+                        <div>
+                            <label htmlFor="name" className="sr-only">
+                                Name
+                            </label>
+                            <input
+                                id="name"
+                                name="name"
+                                type="text"
+                                required
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                placeholder="Full Name"
+                                value={formData.name}
+                                onChange={handleChange}
+                            />
+                        </div>
                         <div>
                             <label htmlFor="username" className="sr-only">
                                 Username
@@ -94,23 +108,22 @@ const SignUp = () => {
                                 name="username"
                                 type="text"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Username"
                                 value={formData.username}
                                 onChange={handleChange}
                             />
                         </div>
                         <div>
-                            <label htmlFor="email-address" className="sr-only">
+                            <label htmlFor="email" className="sr-only">
                                 Email address
                             </label>
                             <input
-                                id="email-address"
+                                id="email"
                                 name="email"
                                 type="email"
-                                autoComplete="email"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Email address"
                                 value={formData.email}
                                 onChange={handleChange}
@@ -124,25 +137,23 @@ const SignUp = () => {
                                 id="password"
                                 name="password"
                                 type="password"
-                                autoComplete="new-password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={handleChange}
                             />
                         </div>
                         <div>
-                            <label htmlFor="confirm-password" className="sr-only">
+                            <label htmlFor="confirmPassword" className="sr-only">
                                 Confirm Password
                             </label>
                             <input
-                                id="confirm-password"
+                                id="confirmPassword"
                                 name="confirmPassword"
                                 type="password"
-                                autoComplete="new-password"
                                 required
-                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 placeholder="Confirm Password"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
@@ -151,24 +162,20 @@ const SignUp = () => {
                     </div>
 
                     {error && (
-                        <div className="text-red-500 text-sm text-center">
-                            {error}
-                        </div>
+                        <div className="text-red-500 text-sm text-center">{error}</div>
                     )}
 
                     <div>
                         <button
                             type="submit"
                             disabled={loading}
-                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-                                loading
+                            className={`group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${loading
                                     ? 'bg-indigo-400 cursor-not-allowed'
                                     : 'bg-indigo-600 hover:bg-indigo-700'
-                            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
+                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                         >
                             {loading ? (
                                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                                    {/* Loading spinner */}
                                     <svg
                                         className="animate-spin h-5 w-5 text-indigo-300"
                                         xmlns="http://www.w3.org/2000/svg"
