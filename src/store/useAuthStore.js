@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "https://rtbackend-6z7a.onrender.com" : "hthttps://rtbackend-6z7a.onrender.com";
+const BASE_URL =  "https://rtbackend-6z7a.onrender.com";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -18,6 +18,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/auth/check");
 
+      console.log(res.data);
       set({ authUser: res.data });
       get().connectSocket();
     } catch (error) {
