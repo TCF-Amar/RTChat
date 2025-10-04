@@ -37,6 +37,7 @@ node_modules
 bower_components
 
 *.sublime*
+.env
 
 psd
 thumb
