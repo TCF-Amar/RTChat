@@ -20,18 +20,24 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
+    if (!selectedUser?._id) return;
+    
     getMessages(selectedUser._id);
-
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
-  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+  }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
-    if (messageEndRef.current && messages) {
+    if (messageEndRef.current) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages?.length]);
+
+  // Guard against no selected user
+  if (!selectedUser) {
+    return null;
+  }
 
   if (isMessagesLoading) {
     return (
@@ -48,38 +54,54 @@ const ChatContainer = () => {
       <ChatHeader />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messages?.map((message, idx) => (
           <div
             key={message._id}
             className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
-            ref={messageEndRef}
+            // Only add ref to the last message
+            ref={idx === messages.length - 1 ? messageEndRef : null}
           >
-            <div className=" chat-image avatar">
+            <div className="chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
                   src={
                     message.senderId === authUser._id
-                      ? authUser.profilePic || "/avatar.png"
-                      : selectedUser.profilePic || "/avatar.png"
+                      ? authUser?.profilePic || "/avatar.png"
+                      : selectedUser?.profilePic || "/avatar.png"
                   }
                   alt="profile pic"
+                  className="object-cover"
                 />
               </div>
             </div>
-            <div className="chat-header mb-1">
-              <time className="text-xs opacity-50 ml-1">
-                {formatMessageTime(message.createdAt)}
-              </time>
-            </div>
-            <div className="chat-bubble flex flex-col">
+           
+            <div 
+              className={`chat-bubble flex flex-col text-wrap relative ${
+                message.senderId === authUser._id
+                  ? "bg-primary text-primary-content" // Sender message
+                  : "bg-base-200 text-base-content"  // Receiver message
+              }`}
+            >
               {message.image && (
                 <img
                   src={message.image}
                   alt="Attachment"
                   className="sm:max-w-[200px] rounded-md mb-2"
+                  loading="lazy"
                 />
               )}
-              {message.text && <p>{message.text}</p>}
+              {message.text && <p className="text text-wrap break-words">{message.text}</p>}
+              <div className={`chat-footer text-xs mt-1 ${
+                message.senderId === authUser._id
+                  ? "opacity-70"  // Sender timestamp
+                  : "opacity-60"  // Receiver timestamp
+              }`}>
+                <time>
+                  {formatMessageTime(message.createdAt)} • {" "}
+                  <span>{new Date(message.createdAt).toLocaleDateString()}</span> • {" "}
+                  <span>{new Date(message.createdAt).toLocaleString("en-US", { weekday: "long" })}</span>
+                </time>
+              </div>
             </div>
           </div>
         ))}
